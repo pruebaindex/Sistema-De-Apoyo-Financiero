@@ -193,7 +193,7 @@
 
   <!-- Lógica UI JavaScript -->
   <script>
-    window.transactions = JSON.parse(localStorage.getItem('saf_local_trans') || '[]');
+    window.transactions = [];
     let chartInstance = null;
 
     const authBtn = document.getElementById('authBtn');
@@ -236,7 +236,6 @@
       if (window.firebaseUser && window.saveToFirestore) {
         await window.saveToFirestore(window.transactions);
       }
-      localStorage.setItem('saf_local_trans', JSON.stringify(window.transactions));
       updateUI();
     }
 
@@ -340,7 +339,7 @@
     updateUI();
   </script>
 
-  <!-- Módulo Firebase Configurado (Sincronización Cloud) -->
+  <!-- Módulo Firebase Configurado (Limpieza al Cerrar Sesión) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -375,7 +374,6 @@
         }
       };
 
-      // Inicio con Google por Popup
       document.getElementById('googleLogin').onclick = async (e) => {
         e.preventDefault();
         try {
@@ -425,12 +423,19 @@
                 amount: parseFloat(t.amount) || 0
               }));
               if (typeof updateUI === 'function') updateUI();
+            } else {
+              window.transactions = [];
+              if (typeof updateUI === 'function') updateUI();
             }
           });
         } else {
           userName.textContent = "Invitado (Modo Local)";
           userStatus.textContent = "Inicia sesión con Google o Email para aislar tus datos en la nube.";
           authBtn.textContent = "Iniciar Sesión";
+          
+          // Limpiar pantalla al cerrar sesión
+          window.transactions = [];
+          if (typeof updateUI === 'function') updateUI();
         }
       });
     } catch (error) {
