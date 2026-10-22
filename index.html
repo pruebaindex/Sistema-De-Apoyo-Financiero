@@ -193,7 +193,7 @@
 
   <!-- Lógica UI JavaScript -->
   <script>
-    let transactions = JSON.parse(localStorage.getItem('saf_local_trans') || '[]');
+    window.transactions = JSON.parse(localStorage.getItem('saf_local_trans') || '[]');
     let chartInstance = null;
 
     const authBtn = document.getElementById('authBtn');
@@ -222,23 +222,22 @@
         category: document.getElementById('category').value
       };
 
-      transactions.push(newT);
+      window.transactions.push(newT);
       await saveTransactions();
       transForm.reset();
     });
 
     window.deleteTrans = async (id) => {
-      transactions = transactions.filter(t => t.id !== id);
+      window.transactions = window.transactions.filter(t => t.id !== id);
       await saveTransactions();
     };
 
     async function saveTransactions() {
       if (window.firebaseUser && window.saveToFirestore) {
-        await window.saveToFirestore(transactions);
-      } else {
-        localStorage.setItem('saf_local_trans', JSON.stringify(transactions));
-        updateUI();
+        await window.saveToFirestore(window.transactions);
       }
+      localStorage.setItem('saf_local_trans', JSON.stringify(window.transactions));
+      updateUI();
     }
 
     function updateUI() {
@@ -251,7 +250,7 @@
       const table = document.getElementById('transTable');
       table.innerHTML = '';
 
-      transactions.forEach(t => {
+      window.transactions.forEach(t => {
         if (t.type === 'income') inc += t.amount;
         else {
           exp += t.amount;
@@ -341,7 +340,7 @@
     updateUI();
   </script>
 
-  <!-- Módulo Firebase Configurado (Popup Directo) -->
+  <!-- Módulo Firebase Configurado (Sincronización Cloud) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -421,7 +420,10 @@
           
           onSnapshot(doc(db, "users", user.uid), (docSnap) => {
             if (docSnap.exists() && docSnap.data().items) {
-              window.transactions = docSnap.data().items;
+              window.transactions = docSnap.data().items.map(t => ({
+                ...t,
+                amount: parseFloat(t.amount) || 0
+              }));
               if (typeof updateUI === 'function') updateUI();
             }
           });
