@@ -341,13 +341,12 @@
     updateUI();
   </script>
 
-  <!-- Módulo Firebase Configurado con tu Clave Real -->
+  <!-- Módulo Firebase Configurado (Popup Directo) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
       getAuth, 
-      signInWithRedirect, 
-      getRedirectResult, 
+      signInWithPopup, 
       GoogleAuthProvider, 
       signInWithEmailAndPassword, 
       createUserWithEmailAndPassword, 
@@ -377,15 +376,16 @@
         }
       };
 
-      // Recibir el resultado de redirección de Google
-      getRedirectResult(auth).catch((err) => {
-        console.error("Error en redirección:", err);
-      });
-
-      document.getElementById('googleLogin').onclick = (e) => {
+      // Inicio con Google por Popup
+      document.getElementById('googleLogin').onclick = async (e) => {
         e.preventDefault();
-        const provider = new GoogleAuthProvider();
-        signInWithRedirect(auth, provider);
+        try {
+          const provider = new GoogleAuthProvider();
+          await signInWithPopup(auth, provider);
+          document.getElementById('authModal').classList.add('hidden');
+        } catch (err) {
+          alert("Error de autenticación con Google: " + err.message);
+        }
       };
 
       document.getElementById('loginEmailBtn').onclick = async (e) => {
@@ -419,7 +419,6 @@
           userStatus.textContent = "Sesión activa en la nube";
           authBtn.textContent = "Cerrar Sesión";
           
-          // Sincronización en tiempo real con Firestore
           onSnapshot(doc(db, "users", user.uid), (docSnap) => {
             if (docSnap.exists() && docSnap.data().items) {
               window.transactions = docSnap.data().items;
