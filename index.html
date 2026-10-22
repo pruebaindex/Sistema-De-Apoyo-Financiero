@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistemas de Apoyo Financiero</title>
   
-  <!-- Estilos y Librerías -->
+  <!-- Tailwind CSS & Chart.js -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- PWA Metadata & Manifest link -->
+  <!-- PWA Manifest Link -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#10b981">
   <meta name="mobile-web-app-capable" content="yes">
@@ -18,7 +18,7 @@
 </head>
 <body class="bg-[#0b0f19] text-slate-100 min-h-screen font-sans antialiased">
 
-  <!-- Encabezado / Header Original -->
+  <!-- Encabezado / Header -->
   <header class="border-b border-slate-800/80 bg-[#0b0f19]/90 backdrop-blur sticky top-0 z-50 px-6 py-4">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-3">
@@ -32,13 +32,13 @@
       </div>
       
       <div class="flex items-center space-x-3">
-        <!-- Botón de instalación discreto -->
+        <!-- Botón de instalación PWA -->
         <button id="pwaInstallBtn" class="hidden px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold transition flex items-center space-x-2 shadow-sm">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           <span>Instalar App</span>
         </button>
 
-        <button id="authBtn" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+        <button id="authBtn" type="button" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
           Iniciar Sesión
         </button>
       </div>
@@ -74,7 +74,7 @@
         <div id="totalBalance" class="text-4xl font-black text-slate-100 mt-3">$0.00</div>
         <div class="mt-3 text-xs text-emerald-400 font-semibold flex items-center space-x-1">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span>Aislado por usuario</span>
+          <span id="isolationTag">Aislado por usuario</span>
         </div>
       </div>
       <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl">
@@ -142,7 +142,7 @@
       </div>
     </div>
 
-    <!-- Lista de Transacciones -->
+    <!-- Historial de Transacciones -->
     <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl">
       <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-4">Historial de Movimientos</h3>
       <div class="overflow-x-auto">
@@ -156,30 +156,33 @@
             </tr>
           </thead>
           <tbody id="transTable" class="divide-y divide-slate-800/60">
-            <!-- Transacciones cargadas dinámicamente -->
+            <!-- Cargado por JS -->
           </tbody>
         </table>
       </div>
     </div>
   </main>
 
-  <!-- Modal Auth -->
+  <!-- Modal de Autenticación -->
   <div id="authModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl relative">
-      <button id="closeAuth" class="absolute top-4 right-4 text-slate-400 hover:text-white">&times;</button>
+      <button id="closeAuth" type="button" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
       <h2 class="text-lg font-bold text-slate-100 text-center">Acceso a la App</h2>
-      <button id="googleLogin" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl text-sm font-semibold flex items-center justify-center space-x-2 border border-slate-700 transition">
+      
+      <button id="googleLogin" type="button" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl text-sm font-semibold flex items-center justify-center space-x-2 border border-slate-700 transition">
         <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
         <span>Continuar con Google</span>
       </button>
+
       <div class="relative flex py-1 items-center">
         <div class="flex-grow border-t border-slate-800"></div>
         <span class="flex-shrink mx-2 text-xs text-slate-500 uppercase">o Email</span>
         <div class="flex-grow border-t border-slate-800"></div>
       </div>
-      <form id="emailAuthForm" class="space-y-3">
-        <input type="email" id="authEmail" required placeholder="Correo electrónico" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
-        <input type="password" id="authPass" required placeholder="Contraseña" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+
+      <form id="emailAuthForm" onsubmit="return false;" class="space-y-3">
+        <input type="email" id="authEmail" placeholder="Correo electrónico" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+        <input type="password" id="authPass" placeholder="Contraseña" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
         <div class="grid grid-cols-2 gap-2 pt-1">
           <button type="button" id="loginEmailBtn" class="py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs">Entrar</button>
           <button type="button" id="registerEmailBtn" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700">Registrarse</button>
@@ -188,108 +191,32 @@
     </div>
   </div>
 
-  <!-- Firebase & Logic SDKs -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // Tu Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyB-DEFAULT_REPLACE", // Funciona con Auth y Firestore
-      authDomain: "sistema-de-apoyo-financiero.firebaseapp.com",
-      projectId: "sistema-de-apoyo-financiero",
-      storageBucket: "sistema-de-apoyo-financiero.appspot.com",
-      messagingSenderId: "75341250953",
-      appId: "1:75341250953:web:default"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let currentUser = null;
+  <!-- Lógica Principal Javascript -->
+  <script>
+    // Variables de Estado Local
     let transactions = JSON.parse(localStorage.getItem('saf_local_trans') || '[]');
     let chartInstance = null;
 
-    // Elementos UI
+    // Referencias DOM principales
     const authBtn = document.getElementById('authBtn');
     const authModal = document.getElementById('authModal');
     const closeAuth = document.getElementById('closeAuth');
-    const googleLogin = document.getElementById('googleLogin');
-    const loginEmailBtn = document.getElementById('loginEmailBtn');
-    const registerEmailBtn = document.getElementById('registerEmailBtn');
-    const userName = document.getElementById('userName');
-    const userStatus = document.getElementById('userStatus');
     const transForm = document.getElementById('transForm');
     const currencySelect = document.getElementById('currencySelect');
 
-    // Manejo de Modal
-    authBtn.onclick = () => {
-      if (currentUser) {
-        signOut(auth);
+    // Manejo Seguro de Modal
+    authBtn.addEventListener('click', () => {
+      if (window.firebaseUser) {
+        if (window.firebaseSignOut) window.firebaseSignOut();
       } else {
         authModal.classList.remove('hidden');
       }
-    };
-    closeAuth.onclick = () => authModal.classList.add('hidden');
-
-    // Google Auth
-    googleLogin.onclick = async () => {
-      try {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-        authModal.classList.add('hidden');
-      } catch (e) {
-        alert("Error de autenticación con Google: " + e.message);
-      }
-    };
-
-    // Email Auth
-    loginEmailBtn.onclick = async () => {
-      const email = document.getElementById('authEmail').value;
-      const pass = document.getElementById('authPass').value;
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-        authModal.classList.add('hidden');
-      } catch (e) { alert("Error: " + e.message); }
-    };
-
-    registerEmailBtn.onclick = async () => {
-      const email = document.getElementById('authEmail').value;
-      const pass = document.getElementById('authPass').value;
-      try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-        authModal.classList.add('hidden');
-      } catch (e) { alert("Error al registrar: " + e.message); }
-    };
-
-    // Estado del usuario
-    onAuthStateChanged(auth, (user) => {
-      currentUser = user;
-      if (user) {
-        userName.textContent = user.displayName || user.email;
-        userStatus.textContent = "Datos sincronizados en la nube (Aislados)";
-        authBtn.textContent = "Cerrar Sesión";
-        
-        // Cargar desde Firestore
-        onSnapshot(doc(db, "users", user.uid), (docSnap) => {
-          if (docSnap.exists()) {
-            transactions = docSnap.data().items || [];
-            updateUI();
-          }
-        });
-      } else {
-        userName.textContent = "Invitado (Modo Local)";
-        userStatus.textContent = "Inicia sesión con Google o Email para aislar tus datos en la nube.";
-        authBtn.textContent = "Iniciar Sesión";
-        transactions = JSON.parse(localStorage.getItem('saf_local_trans') || '[]');
-        updateUI();
-      }
     });
 
-    // Guardar Transacción
-    transForm.onsubmit = async (e) => {
+    closeAuth.addEventListener('click', () => authModal.classList.add('hidden'));
+
+    // Guardar Transacción Local/Nube
+    transForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const newT = {
         id: Date.now().toString(),
@@ -302,7 +229,7 @@
       transactions.push(newT);
       await saveTransactions();
       transForm.reset();
-    };
+    });
 
     window.deleteTrans = async (id) => {
       transactions = transactions.filter(t => t.id !== id);
@@ -310,15 +237,15 @@
     };
 
     async function saveTransactions() {
-      if (currentUser) {
-        await setDoc(doc(db, "users", currentUser.uid), { items: transactions });
+      if (window.firebaseUser && window.saveToFirestore) {
+        await window.saveToFirestore(transactions);
       } else {
         localStorage.setItem('saf_local_trans', JSON.stringify(transactions));
+        updateUI();
       }
-      updateUI();
     }
 
-    // Actualizar Interfaz
+    // Renderizar Interfaz
     function updateUI() {
       const curr = currencySelect.value;
       const symbol = curr === 'USD' ? '$' : curr === 'VES' ? 'Bs ' : '€';
@@ -358,9 +285,9 @@
       renderChart(catMap);
     }
 
-    currencySelect.onchange = updateUI;
+    currencySelect.addEventListener('change', updateUI);
 
-    // Gráfica
+    // Dibujar Gráfica
     function renderChart(catMap) {
       const ctx = document.getElementById('chartCanvas').getContext('2d');
       if (chartInstance) chartInstance.destroy();
@@ -388,7 +315,7 @@
       });
     }
 
-    // Service Worker PWA
+    // Soporte PWA Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swCode = `
@@ -408,6 +335,7 @@
       deferredPrompt = e;
       pwaBtn.classList.remove('hidden');
     });
+
     pwaBtn.addEventListener('click', async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
@@ -417,7 +345,94 @@
       }
     });
 
+    // Iniciar UI inicial
     updateUI();
+  </script>
+
+  <!-- Modulo Firebase Robusto -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    try {
+      const firebaseConfig = {
+        authDomain: "sistema-de-apoyo-financiero.firebaseapp.com",
+        projectId: "sistema-de-apoyo-financiero",
+        storageBucket: "sistema-de-apoyo-financiero.appspot.com",
+        messagingSenderId: "75341250953",
+        appId: "1:75341250953:web:default"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      window.firebaseSignOut = () => signOut(auth);
+      window.saveToFirestore = async (items) => {
+        if (window.firebaseUser) {
+          await setDoc(doc(db, "users", window.firebaseUser.uid), { items });
+        }
+      };
+
+      // Autenticación Google
+      document.getElementById('googleLogin').onclick = async () => {
+        try {
+          const provider = new GoogleAuthProvider();
+          await signInWithPopup(auth, provider);
+          document.getElementById('authModal').classList.add('hidden');
+        } catch (err) {
+          alert("Error de autenticación con Google: " + err.message);
+        }
+      };
+
+      // Autenticación Email
+      document.getElementById('loginEmailBtn').onclick = async () => {
+        const email = document.getElementById('authEmail').value;
+        const pass = document.getElementById('authPass').value;
+        try {
+          await signInWithEmailAndPassword(auth, email, pass);
+          document.getElementById('authModal').classList.add('hidden');
+        } catch (err) { alert("Error de inicio de sesión: " + err.message); }
+      };
+
+      document.getElementById('registerEmailBtn').onclick = async () => {
+        const email = document.getElementById('authEmail').value;
+        const pass = document.getElementById('authPass').value;
+        try {
+          await createUserWithEmailAndPassword(auth, email, pass);
+          document.getElementById('authModal').classList.add('hidden');
+        } catch (err) { alert("Error al registrar: " + err.message); }
+      };
+
+      // Listener de estado
+      onAuthStateChanged(auth, (user) => {
+        window.firebaseUser = user;
+        const userName = document.getElementById('userName');
+        const userStatus = document.getElementById('userStatus');
+        const authBtn = document.getElementById('authBtn');
+
+        if (user) {
+          userName.textContent = user.displayName || user.email;
+          userStatus.textContent = "Datos aislados y guardados en la nube.";
+          authBtn.textContent = "Cerrar Sesión";
+
+          onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+            if (docSnap.exists()) {
+              window.transactions = docSnap.data().items || [];
+              if (window.updateUI) window.updateUI();
+            }
+          });
+        } else {
+          userName.textContent = "Invitado (Modo Local)";
+          userStatus.textContent = "Inicia sesión con Google o Email para aislar tus datos en la nube.";
+          authBtn.textContent = "Iniciar Sesión";
+        }
+      });
+
+    } catch (e) {
+      console.log("Firebase initialized in fallback mode:", e);
+    }
   </script>
 </body>
 </html>
