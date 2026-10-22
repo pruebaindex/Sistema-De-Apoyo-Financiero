@@ -1,58 +1,130 @@
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { 
-    getAuth, 
-    signInWithRedirect, 
-    getRedirectResult, 
-    GoogleAuthProvider, 
-    onAuthStateChanged,
-    signOut 
-  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Apoyo Financiero</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            color: #1f2937;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #6b7280;
+            margin-bottom: 25px;
+        }
+        #googleLoginBtn {
+            background: #10B981;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+        }
+        #googleLoginBtn:hover {
+            background: #059669;
+        }
+        #userStatus {
+            font-weight: bold;
+            color: #374151;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
 
-  // Tus credenciales de Firebase
-  const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "sistema-de-apoyo-financiero.firebaseapp.com",
-    projectId: "sistema-de-apoyo-financiero",
-    storageBucket: "sistema-de-apoyo-financiero.appspot.com",
-    messagingSenderId: "TU_MESSAGING_SENDER_ID",
-    appId: "TU_APP_ID"
-  };
+    <div class="card">
+        <h1>Sistema Financiero</h1>
+        <p>Inicia sesión para acceder a tu cuenta</p>
+        
+        <!-- Botón de inicio de sesión -->
+        <button id="googleLoginBtn">Continuar con Google</button>
+        
+        <!-- Estado del usuario -->
+        <div id="userStatus"></div>
+    </div>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+    <!-- Lógica oficial y segura de Firebase v10 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithRedirect, 
+            getRedirectResult, 
+            GoogleAuthProvider, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-  const btnLogin = document.getElementById('googleLoginBtn');
-  const userStatusDiv = document.getElementById('userStatus');
+        // Tus credenciales reales de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbB6zND3X4-2TEDN8rT0M...", // Pega aquí tu apiKey completa
+            authDomain: "sistema-de-apoyo-financiero.firebaseapp.com",
+            projectId: "sistema-de-apoyo-financiero",
+            storageBucket: "sistema-de-apoyo-financiero.appspot.com",
+            messagingSenderId: "75341250953",
+            appId: "1:75341250953:web:5b38b0b6534f0023b6a158"
+        };
 
-  if (btnLogin) {
-    btnLogin.addEventListener('click', (e) => {
-      e.preventDefault();
-      signInWithRedirect(auth, provider);
-    });
-  }
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
-  getRedirectResult(auth)
-    .then((result) => {
-      if (result) {
-        console.log("¡Bienvenido!", result.user.displayName);
-      }
-    })
-    .catch((error) => {
-      console.error("Error en la redirección:", error);
-      alert("No se pudo iniciar sesión: " + error.message);
-    });
+        const btnLogin = document.getElementById('googleLoginBtn');
+        const userStatusDiv = document.getElementById('userStatus');
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      console.log("Usuario activo:", user.email);
-      if (btnLogin) btnLogin.style.display = 'none';
-      if (userStatusDiv) userStatusDiv.innerText = `Conectado como: ${user.displayName || user.email}`;
-    } else {
-      console.log("No hay usuario activo.");
-      if (btnLogin) btnLogin.style.display = 'block';
-      if (userStatusDiv) userStatusDiv.innerText = '';
-    }
-  });
-</script>
+        // Acción al presionar el botón
+        if (btnLogin) {
+            btnLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                signInWithRedirect(auth, provider);
+            });
+        }
+
+        // Procesar la respuesta al volver de Google
+        getRedirectResult(auth)
+            .then((result) => {
+                if (result) {
+                    console.log("¡Bienvenido!", result.user.displayName);
+                }
+            })
+            .catch((error) => {
+                console.error("Error en la redirección:", error);
+                alert("No se pudo iniciar sesión: " + error.message);
+            });
+
+        // Mantener la sesión sincronizada
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (btnLogin) btnLogin.style.display = 'none';
+                if (userStatusDiv) userStatusDiv.innerText = `Conectado como: ${user.displayName || user.email}`;
+            } else {
+                if (btnLogin) btnLogin.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
