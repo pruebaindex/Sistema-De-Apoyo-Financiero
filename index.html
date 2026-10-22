@@ -7,7 +7,7 @@
     GoogleAuthProvider, 
     onAuthStateChanged,
     signOut 
-  > from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
   // Tus credenciales de Firebase
   const firebaseConfig = {
@@ -23,9 +23,8 @@
   const auth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // Referencia a los elementos de tu página (asegúrate de que tengan estos IDs o adáptalos)
   const btnLogin = document.getElementById('googleLoginBtn');
-  const userStatusDiv = document.getElementById('userStatus'); // Opcional para mostrar info
+  const userStatusDiv = document.getElementById('userStatus');
 
   if (btnLogin) {
     btnLogin.addEventListener('click', (e) => {
@@ -34,7 +33,6 @@
     });
   }
 
-  // Procesar el resultado cuando Google redirige de vuelta a tu web
   getRedirectResult(auth)
     .then((result) => {
       if (result) {
@@ -46,15 +44,12 @@
       alert("No se pudo iniciar sesión: " + error.message);
     });
 
-  // Escuchar en tiempo real si el usuario está conectado o no
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      // El usuario ha iniciado sesión correctamente
       console.log("Usuario activo:", user.email);
-      if (btnLogin) btnLogin.style.display = 'none'; // Ocultar botón de login si ya entró
+      if (btnLogin) btnLogin.style.display = 'none';
       if (userStatusDiv) userStatusDiv.innerText = `Conectado como: ${user.displayName || user.email}`;
     } else {
-      // El usuario no ha iniciado sesión o cerró sesión
       console.log("No hay usuario activo.");
       if (btnLogin) btnLogin.style.display = 'block';
       if (userStatusDiv) userStatusDiv.innerText = '';
