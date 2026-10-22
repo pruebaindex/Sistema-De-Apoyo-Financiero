@@ -341,7 +341,7 @@
     updateUI();
   </script>
 
-  <!-- Módulo Firebase Ajustado (Con apiKey incluida y Redirect seguro) -->
+  <!-- Módulo Firebase Configurado con tu Clave Real -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -358,10 +358,10 @@
 
     try {
       const firebaseConfig = {
-        apiKey: "AIzaSyDbB6zND3X4-2TEDN8rT0M381aJc518gVw",
+        apiKey: "AIzaSyDbB6zND3X4-2TEDN8rT0Mi3ADN9WYr4Ks",
         authDomain: "sistema-de-apoyo-financiero.firebaseapp.com",
         projectId: "sistema-de-apoyo-financiero",
-        storageBucket: "sistema-de-apoyo-financiero.appspot.com",
+        storageBucket: "sistema-de-apoyo-financiero.firebasestorage.app",
         messagingSenderId: "75341250953",
         appId: "1:75341250953:web:5b38b0b6534f0023b6a158"
       };
@@ -377,7 +377,7 @@
         }
       };
 
-      // Manejar la respuesta del redireccionamiento de Google
+      // Recibir el resultado de redirección de Google
       getRedirectResult(auth).catch((err) => {
         console.error("Error en redirección:", err);
       });
@@ -419,7 +419,7 @@
           userStatus.textContent = "Sesión activa en la nube";
           authBtn.textContent = "Cerrar Sesión";
           
-          // Escuchar cambios en Firestore en tiempo real
+          // Sincronización en tiempo real con Firestore
           onSnapshot(doc(db, "users", user.uid), (docSnap) => {
             if (docSnap.exists() && docSnap.data().items) {
               window.transactions = docSnap.data().items;
