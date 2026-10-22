@@ -216,7 +216,6 @@
       if (window.firebaseSignOut) window.firebaseSignOut();
     });
 
-    // Formateador profesional de miles (.) y decimales (,)
     function formatMoney(amount, symbol) {
       const formatted = new Intl.NumberFormat('es-VE', {
         minimumFractionDigits: 2,
@@ -350,7 +349,7 @@
     });
   </script>
 
-  <!-- Módulo Firebase Estricto (Sin Modo Local) -->
+  <!-- Módulo Firebase con Mensajes Amigables en Español -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -385,6 +384,27 @@
         }
       };
 
+      // Traductor de errores de Firebase a mensajes claros y naturales
+      function getFriendlyError(err) {
+        const code = err.code || "";
+        if (code.includes('email-already-in-use')) {
+          return "Este correo ya se encuentra registrado. Por favor, inicia sesión.";
+        }
+        if (code.includes('user-not-found') || code.includes('invalid-credential')) {
+          return "Este correo no se encuentra registrado o la contraseña es incorrecta.";
+        }
+        if (code.includes('wrong-password')) {
+          return "La contraseña ingresada es incorrecta.";
+        }
+        if (code.includes('weak-password')) {
+          return "La contraseña es muy débil (debe tener al menos 6 caracteres).";
+        }
+        if (code.includes('invalid-email')) {
+          return "El formato del correo electrónico no es válido.";
+        }
+        return "Ocurrió un error: " + err.message;
+      }
+
       document.getElementById('gateGoogleLogin').onclick = async (e) => {
         e.preventDefault();
         try {
@@ -401,7 +421,9 @@
         const pass = document.getElementById('gatePass').value;
         try {
           await signInWithEmailAndPassword(auth, email, pass);
-        } catch (err) { alert("Error de inicio de sesión: " + err.message); }
+        } catch (err) { 
+          alert(getFriendlyError(err)); 
+        }
       };
 
       document.getElementById('gateRegisterBtn').onclick = async (e) => {
@@ -410,7 +432,9 @@
         const pass = document.getElementById('gatePass').value;
         try {
           await createUserWithEmailAndPassword(auth, email, pass);
-        } catch (err) { alert("Error al registrar: " + err.message); }
+        } catch (err) { 
+          alert(getFriendlyError(err)); 
+        }
       };
 
       onAuthStateChanged(auth, (user) => {
