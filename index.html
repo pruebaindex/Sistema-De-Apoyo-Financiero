@@ -18,7 +18,7 @@
 </head>
 <body class="bg-[#0b0f19] text-slate-100 min-h-screen font-sans antialiased flex flex-col justify-between">
 
-  <!-- Pantalla de Bloqueo / Autenticación Obligatoria (Se oculta al entrar) -->
+  <!-- Pantalla de Bloqueo / Autenticación Obligatoria -->
   <div id="loginGate" class="fixed inset-0 bg-[#0b0f19] z-50 flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 max-w-md w-full space-y-6 shadow-2xl text-center relative">
       <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-3xl mx-auto shadow-lg shadow-emerald-500/10">
@@ -27,7 +27,7 @@
       <div>
         <h1 class="text-2xl font-bold tracking-tight text-slate-100">Sistemas de Apoyo Financiero</h1>
         <p class="text-xs text-emerald-400 font-semibold tracking-wider uppercase mt-1">Finanzas Personales Seguras</p>
-        <p class="text-sm text-slate-400 mt-3">Inicia sesión para acceder a tu panel financiero en la nube o continúa en modo invitado.</p>
+        <p class="text-sm text-slate-400 mt-3">Inicia sesión con tu cuenta para acceder a tus finanzas privadas en la nube.</p>
       </div>
       
       <div class="space-y-3 pt-2">
@@ -49,10 +49,6 @@
           <button type="button" id="gateLoginBtn" class="py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">Entrar</button>
           <button type="button" id="gateRegisterBtn" class="py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-sm border border-slate-700 transition">Registrarse</button>
         </div>
-
-        <button type="button" id="guestBtn" class="w-full mt-2 py-2 text-xs text-slate-400 hover:text-slate-200 transition">
-          Entrar como Invitado (Modo Local)
-        </button>
       </div>
     </div>
   </div>
@@ -220,15 +216,6 @@
       if (window.firebaseSignOut) window.firebaseSignOut();
     });
 
-    document.getElementById('guestBtn').addEventListener('click', () => {
-      loginGate.classList.add('hidden');
-      mainAppContent.classList.remove('hidden');
-      document.getElementById('userName').textContent = "Invitado (Modo Local)";
-      document.getElementById('userStatus').textContent = "Modo local sin conexión a la nube";
-      window.transactions = JSON.parse(localStorage.getItem('saf_local_trans') || '[]');
-      updateUI();
-    });
-
     transForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const newT = {
@@ -252,8 +239,6 @@
     async function saveTransactions() {
       if (window.firebaseUser && window.saveToFirestore) {
         await window.saveToFirestore(window.transactions);
-      } else {
-        localStorage.setItem('saf_local_trans', JSON.stringify(window.transactions));
       }
       updateUI();
     }
@@ -356,7 +341,7 @@
     });
   </script>
 
-  <!-- Módulo Firebase Configurado (Control de Pantalla de Acceso) -->
+  <!-- Módulo Firebase Estricto (Sin Modo Local) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
@@ -427,7 +412,6 @@
         const userStatus = document.getElementById('userStatus');
 
         if (user) {
-          // Ocultar pantalla de acceso y mostrar la app
           loginGate.classList.add('hidden');
           mainAppContent.classList.remove('hidden');
 
@@ -447,7 +431,6 @@
             }
           });
         } else {
-          // Mostrar pantalla de acceso obligatoriamente y limpiar datos
           loginGate.classList.remove('hidden');
           mainAppContent.classList.add('hidden');
           window.transactions = [];
