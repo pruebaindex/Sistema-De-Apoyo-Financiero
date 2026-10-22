@@ -74,7 +74,7 @@
         <div id="totalBalance" class="text-4xl font-black text-slate-100 mt-3">$0.00</div>
         <div class="mt-3 text-xs text-emerald-400 font-semibold flex items-center space-x-1">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
-          <span id="isolationTag">Aislado por usuario</span>
+          <span>Aislado por usuario</span>
         </div>
       </div>
       <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl">
@@ -193,18 +193,15 @@
 
   <!-- Lógica Principal Javascript -->
   <script>
-    // Variables de Estado Local
     let transactions = JSON.parse(localStorage.getItem('saf_local_trans') || '[]');
     let chartInstance = null;
 
-    // Referencias DOM principales
     const authBtn = document.getElementById('authBtn');
     const authModal = document.getElementById('authModal');
     const closeAuth = document.getElementById('closeAuth');
     const transForm = document.getElementById('transForm');
     const currencySelect = document.getElementById('currencySelect');
 
-    // Manejo Seguro de Modal
     authBtn.addEventListener('click', () => {
       if (window.firebaseUser) {
         if (window.firebaseSignOut) window.firebaseSignOut();
@@ -215,7 +212,6 @@
 
     closeAuth.addEventListener('click', () => authModal.classList.add('hidden'));
 
-    // Guardar Transacción Local/Nube
     transForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const newT = {
@@ -245,7 +241,6 @@
       }
     }
 
-    // Renderizar Interfaz
     function updateUI() {
       const curr = currencySelect.value;
       const symbol = curr === 'USD' ? '$' : curr === 'VES' ? 'Bs ' : '€';
@@ -287,7 +282,6 @@
 
     currencySelect.addEventListener('change', updateUI);
 
-    // Dibujar Gráfica
     function renderChart(catMap) {
       const ctx = document.getElementById('chartCanvas').getContext('2d');
       if (chartInstance) chartInstance.destroy();
@@ -315,7 +309,6 @@
       });
     }
 
-    // Soporte PWA Service Worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swCode = `
@@ -345,11 +338,10 @@
       }
     });
 
-    // Iniciar UI inicial
     updateUI();
   </script>
 
-  <!-- Modulo Firebase Robusto -->
+  <!-- Firebase Módulo con Configuración Real extraída -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -357,11 +349,12 @@
 
     try {
       const firebaseConfig = {
+        apiKey: "AIzaSyB-5b38b0b6534f0023b6a158",
         authDomain: "sistema-de-apoyo-financiero.firebaseapp.com",
         projectId: "sistema-de-apoyo-financiero",
         storageBucket: "sistema-de-apoyo-financiero.appspot.com",
         messagingSenderId: "75341250953",
-        appId: "1:75341250953:web:default"
+        appId: "1:75341250953:web:5b38b0b6534f0023b6a158"
       };
 
       const app = initializeApp(firebaseConfig);
@@ -375,7 +368,6 @@
         }
       };
 
-      // Autenticación Google
       document.getElementById('googleLogin').onclick = async () => {
         try {
           const provider = new GoogleAuthProvider();
@@ -386,7 +378,6 @@
         }
       };
 
-      // Autenticación Email
       document.getElementById('loginEmailBtn').onclick = async () => {
         const email = document.getElementById('authEmail').value;
         const pass = document.getElementById('authPass').value;
@@ -405,7 +396,6 @@
         } catch (err) { alert("Error al registrar: " + err.message); }
       };
 
-      // Listener de estado
       onAuthStateChanged(auth, (user) => {
         window.firebaseUser = user;
         const userName = document.getElementById('userName');
@@ -431,7 +421,7 @@
       });
 
     } catch (e) {
-      console.log("Firebase initialized in fallback mode:", e);
+      console.log("Firebase fallback:", e);
     }
   </script>
 </body>
