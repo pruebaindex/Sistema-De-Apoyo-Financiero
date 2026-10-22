@@ -1,130 +1,440 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Apoyo Financiero</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 400px;
-            width: 100%;
-        }
-        h1 {
-            color: #1f2937;
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #6b7280;
-            margin-bottom: 25px;
-        }
-        #googleLoginBtn {
-            background: #10B981;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.2s;
-        }
-        #googleLoginBtn:hover {
-            background: #059669;
-        }
-        #userStatus {
-            font-weight: bold;
-            color: #374151;
-            margin-top: 15px;
-        }
-    </style>
-</head>
-<body>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistemas de Apoyo Financiero</title>
+  
+  <!-- Tailwind CSS & Chart.js -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div class="card">
-        <h1>Sistema Financiero</h1>
-        <p>Inicia sesión para acceder a tu cuenta</p>
-        
-        <!-- Botón de inicio de sesión -->
-        <button id="googleLoginBtn">Continuar con Google</button>
-        
-        <!-- Estado del usuario -->
-        <div id="userStatus"></div>
+  <!-- PWA Manifest Link -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#10b981">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Finanzas">
+</head>
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen font-sans antialiased">
+
+  <!-- Encabezado / Header -->
+  <header class="border-b border-slate-800/80 bg-[#0b0f19]/90 backdrop-blur sticky top-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-bold text-xl shadow-lg shadow-emerald-500/10">
+          S
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-slate-100 leading-tight">Sistemas de Apoyo Financiero</h1>
+          <p class="text-xs text-emerald-400 font-semibold tracking-wider uppercase">Finanzas Personales</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-3">
+        <!-- Botón PWA -->
+        <button id="pwaInstallBtn" type="button" class="hidden px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-semibold transition flex items-center space-x-2 shadow-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+          <span>Instalar App</span>
+        </button>
+
+        <button id="authBtn" type="button" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+          Iniciar Sesión
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-7xl mx-auto px-6 py-8 space-y-6">
+    <!-- Banner de Usuario -->
+    <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-xl">
+      <div class="flex items-center space-x-4">
+        <div class="w-12 h-12 rounded-full bg-slate-800 border border-slate-700/60 flex items-center justify-center text-slate-300">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+        </div>
+        <div>
+          <div id="userName" class="text-base font-bold text-slate-200">Invitado (Modo Local)</div>
+          <div id="userStatus" class="text-xs text-slate-400 mt-0.5">Inicia sesión con Google o Email para aislar tus datos en la nube.</div>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <select id="currencySelect" class="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-4 py-2 text-sm font-semibold focus:outline-none focus:border-emerald-500 transition">
+          <option value="USD">USD ($)</option>
+          <option value="VES">VES (Bs)</option>
+          <option value="EUR">EUR (€)</option>
+        </select>
+      </div>
     </div>
 
-    <!-- Lógica oficial y segura de Firebase v10 -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { 
-            getAuth, 
-            signInWithRedirect, 
-            getRedirectResult, 
-            GoogleAuthProvider, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    <!-- Métricas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Balance Total</span>
+        <div id="totalBalance" class="text-4xl font-black text-slate-100 mt-3">$0.00</div>
+        <div class="mt-3 text-xs text-emerald-400 font-semibold flex items-center space-x-1">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>Aislado por usuario</span>
+        </div>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Ingresos Totales</span>
+        <div id="totalIncome" class="text-4xl font-black text-emerald-400 mt-3">$0.00</div>
+        <div class="mt-3 text-xs text-slate-400 font-medium">Entradas acumuladas</div>
+      </div>
+      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Gastos Totales</span>
+        <div id="totalExpense" class="text-4xl font-black text-rose-500 mt-3">$0.00</div>
+        <div class="mt-3 text-xs text-slate-400 font-medium">Salidas acumuladas</div>
+      </div>
+    </div>
 
-        // Tus credenciales reales de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDbB6zND3X4-2TEDN8rT0M...", // Pega aquí tu apiKey completa
-            authDomain: "sistema-de-apoyo-financiero.firebaseapp.com",
-            projectId: "sistema-de-apoyo-financiero",
-            storageBucket: "sistema-de-apoyo-financiero.appspot.com",
-            messagingSenderId: "75341250953",
-            appId: "1:75341250953:web:5b38b0b6534f0023b6a158"
-        };
+    <!-- Formulario y Gráfico -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 space-y-4 shadow-xl">
+        <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>NUEVA TRANSACCIÓN</span>
+        </h3>
+        <form id="transForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Descripción</label>
+            <input type="text" id="desc" required placeholder="Ej. Sueldo, Almuerzo, Supermercado" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 transition">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Monto</label>
+              <input type="number" step="0.01" id="amount" required placeholder="0.00" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Tipo</label>
+              <select id="type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 transition">
+                <option value="expense">Gasto</option>
+                <option value="income">Ingreso</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-400 mb-1.5">Categoría</label>
+            <select id="category" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 transition">
+              <option value="Comida y Alimentos">Comida y Alimentos</option>
+              <option value="Servicios y Facturas">Servicios y Facturas</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Entretenimiento">Entretenimiento</option>
+              <option value="Ingreso/Sueldo">Ingreso / Sueldo</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+          <button type="submit" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg shadow-emerald-500/10">
+            Guardar Transacción
+          </button>
+        </form>
+      </div>
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+      <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">DISTRIBUCIÓN DE GASTOS</h3>
+          <span class="text-xs text-slate-400">Por Categoría</span>
+        </div>
+        <div class="relative flex-1 min-h-[240px] flex items-center justify-center">
+          <canvas id="chartCanvas"></canvas>
+        </div>
+      </div>
+    </div>
 
-        const btnLogin = document.getElementById('googleLoginBtn');
-        const userStatusDiv = document.getElementById('userStatus');
+    <!-- Historial -->
+    <div class="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 shadow-xl">
+      <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider mb-4">Historial de Movimientos</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-300">
+          <thead class="text-xs uppercase bg-slate-950 text-slate-400">
+            <tr>
+              <th class="px-4 py-3 rounded-l-xl">Descripción</th>
+              <th class="px-4 py-3">Categoría</th>
+              <th class="px-4 py-3">Monto</th>
+              <th class="px-4 py-3 rounded-r-xl text-right">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="transTable" class="divide-y divide-slate-800/60">
+            <!-- Cargado por JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
 
-        // Acción al presionar el botón
-        if (btnLogin) {
-            btnLogin.addEventListener('click', (e) => {
-                e.preventDefault();
-                signInWithRedirect(auth, provider);
-            });
+  <!-- Modal de Autenticación -->
+  <div id="authModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-2xl relative">
+      <button id="closeAuth" type="button" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+      <h2 class="text-lg font-bold text-slate-100 text-center">Acceso a la App</h2>
+      
+      <button id="googleLogin" type="button" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-xl text-sm font-semibold flex items-center justify-center space-x-2 border border-slate-700 transition">
+        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+        <span>Continuar con Google</span>
+      </button>
+
+      <div class="relative flex py-1 items-center">
+        <div class="flex-grow border-t border-slate-800"></div>
+        <span class="flex-shrink mx-2 text-xs text-slate-500 uppercase">o Email</span>
+        <div class="flex-grow border-t border-slate-800"></div>
+      </div>
+
+      <div class="space-y-3">
+        <input type="email" id="authEmail" placeholder="Correo electrónico" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+        <input type="password" id="authPass" placeholder="Contraseña" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-emerald-500">
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button type="button" id="loginEmailBtn" class="py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs">Entrar</button>
+          <button type="button" id="registerEmailBtn" class="py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700">Registrarse</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lógica UI JavaScript -->
+  <script>
+    let transactions = JSON.parse(localStorage.getItem('saf_local_trans') || '[]');
+    let chartInstance = null;
+
+    const authBtn = document.getElementById('authBtn');
+    const authModal = document.getElementById('authModal');
+    const closeAuth = document.getElementById('closeAuth');
+    const transForm = document.getElementById('transForm');
+    const currencySelect = document.getElementById('currencySelect');
+
+    authBtn.addEventListener('click', () => {
+      if (window.firebaseUser) {
+        if (window.firebaseSignOut) window.firebaseSignOut();
+      } else {
+        authModal.classList.remove('hidden');
+      }
+    });
+
+    closeAuth.addEventListener('click', () => authModal.classList.add('hidden'));
+
+    transForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newT = {
+        id: Date.now().toString(),
+        desc: document.getElementById('desc').value,
+        amount: parseFloat(document.getElementById('amount').value),
+        type: document.getElementById('type').value,
+        category: document.getElementById('category').value
+      };
+
+      transactions.push(newT);
+      await saveTransactions();
+      transForm.reset();
+    });
+
+    window.deleteTrans = async (id) => {
+      transactions = transactions.filter(t => t.id !== id);
+      await saveTransactions();
+    };
+
+    async function saveTransactions() {
+      if (window.firebaseUser && window.saveToFirestore) {
+        await window.saveToFirestore(transactions);
+      } else {
+        localStorage.setItem('saf_local_trans', JSON.stringify(transactions));
+        updateUI();
+      }
+    }
+
+    function updateUI() {
+      const curr = currencySelect.value;
+      const symbol = curr === 'USD' ? '$' : curr === 'VES' ? 'Bs ' : '€';
+
+      let inc = 0, exp = 0;
+      const catMap = {};
+
+      const table = document.getElementById('transTable');
+      table.innerHTML = '';
+
+      transactions.forEach(t => {
+        if (t.type === 'income') inc += t.amount;
+        else {
+          exp += t.amount;
+          catMap[t.category] = (catMap[t.category] || 0) + t.amount;
         }
 
-        // Procesar la respuesta al volver de Google
-        getRedirectResult(auth)
-            .then((result) => {
-                if (result) {
-                    console.log("¡Bienvenido!", result.user.displayName);
-                }
-            })
-            .catch((error) => {
-                console.error("Error en la redirección:", error);
-                alert("No se pudo iniciar sesión: " + error.message);
-            });
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-800/40 transition";
+        tr.innerHTML = `
+          <td class="px-4 py-3 font-medium text-slate-200">${t.desc}</td>
+          <td class="px-4 py-3 text-xs text-slate-400">${t.category}</td>
+          <td class="px-4 py-3 font-bold ${t.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
+            ${t.type === 'income' ? '+' : '-'}${symbol}${t.amount.toFixed(2)}
+          </td>
+          <td class="px-4 py-3 text-right">
+            <button onclick="deleteTrans('${t.id}')" class="text-rose-500 hover:text-rose-400 text-xs font-semibold">Eliminar</button>
+          </td>
+        `;
+        table.appendChild(tr);
+      });
 
-        // Mantener la sesión sincronizada
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                if (btnLogin) btnLogin.style.display = 'none';
-                if (userStatusDiv) userStatusDiv.innerText = `Conectado como: ${user.displayName || user.email}`;
-            } else {
-                if (btnLogin) btnLogin.style.display = 'block';
+      document.getElementById('totalBalance').textContent = `${symbol}${(inc - exp).toFixed(2)}`;
+      document.getElementById('totalIncome').textContent = `${symbol}${inc.toFixed(2)}`;
+      document.getElementById('totalExpense').textContent = `${symbol}${exp.toFixed(2)}`;
+
+      renderChart(catMap);
+    }
+
+    currencySelect.addEventListener('change', updateUI);
+
+    function renderChart(catMap) {
+      const ctx = document.getElementById('chartCanvas').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      const labels = Object.keys(catMap);
+      const data = Object.values(catMap);
+
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.length ? labels : ['Sin Gastos'],
+          datasets: [{
+            data: data.length ? data : [1],
+            backgroundColor: labels.length ? ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#64748b'] : ['#334155'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } }
+          }
+        }
+      });
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swCode = `
+          self.addEventListener('install', (e) => self.skipWaiting());
+          self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request).catch(() => new Response("Modo Offline"))));
+        `;
+        const blob = new Blob([swCode], {type: 'application/javascript'});
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+      });
+    }
+
+    let deferredPrompt;
+    const pwaBtn = document.getElementById('pwaInstallBtn');
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      pwaBtn.classList.remove('hidden');
+    });
+
+    pwaBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') pwaBtn.classList.add('hidden');
+        deferredPrompt = null;
+      }
+    });
+
+    updateUI();
+  </script>
+
+  <!-- Módulo Firebase Ajustado (Con apiKey incluida y Redirect seguro) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithRedirect, 
+      getRedirectResult, 
+      GoogleAuthProvider, 
+      signInWithEmailAndPassword, 
+      createUserWithEmailAndPassword, 
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    try {
+      const firebaseConfig = {
+        apiKey: "AIzaSyDbB6zND3X4-2TEDN8rT0M381aJc518gVw",
+        authDomain: "sistema-de-apoyo-financiero.firebaseapp.com",
+        projectId: "sistema-de-apoyo-financiero",
+        storageBucket: "sistema-de-apoyo-financiero.appspot.com",
+        messagingSenderId: "75341250953",
+        appId: "1:75341250953:web:5b38b0b6534f0023b6a158"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      window.firebaseSignOut = () => signOut(auth);
+      window.saveToFirestore = async (items) => {
+        if (window.firebaseUser) {
+          await setDoc(doc(db, "users", window.firebaseUser.uid), { items });
+        }
+      };
+
+      // Manejar la respuesta del redireccionamiento de Google
+      getRedirectResult(auth).catch((err) => {
+        console.error("Error en redirección:", err);
+      });
+
+      document.getElementById('googleLogin').onclick = (e) => {
+        e.preventDefault();
+        const provider = new GoogleAuthProvider();
+        signInWithRedirect(auth, provider);
+      };
+
+      document.getElementById('loginEmailBtn').onclick = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value;
+        const pass = document.getElementById('authPass').value;
+        try {
+          await signInWithEmailAndPassword(auth, email, pass);
+          document.getElementById('authModal').classList.add('hidden');
+        } catch (err) { alert("Error de inicio de sesión: " + err.message); }
+      };
+
+      document.getElementById('registerEmailBtn').onclick = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value;
+        const pass = document.getElementById('authPass').value;
+        try {
+          await createUserWithEmailAndPassword(auth, email, pass);
+          document.getElementById('authModal').classList.add('hidden');
+        } catch (err) { alert("Error al registrar: " + err.message); }
+      };
+
+      onAuthStateChanged(auth, (user) => {
+        window.firebaseUser = user;
+        const userName = document.getElementById('userName');
+        const userStatus = document.getElementById('userStatus');
+        const authBtn = document.getElementById('authBtn');
+
+        if (user) {
+          userName.textContent = user.displayName || user.email;
+          userStatus.textContent = "Sesión activa en la nube";
+          authBtn.textContent = "Cerrar Sesión";
+          
+          // Escuchar cambios en Firestore en tiempo real
+          onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().items) {
+              window.transactions = docSnap.data().items;
+              if (typeof updateUI === 'function') updateUI();
             }
-        });
-    </script>
+          });
+        } else {
+          userName.textContent = "Invitado (Modo Local)";
+          userStatus.textContent = "Inicia sesión con Google o Email para aislar tus datos en la nube.";
+          authBtn.textContent = "Iniciar Sesión";
+        }
+      });
+    } catch (error) {
+      console.error("Error inicializando Firebase:", error);
+    }
+  </script>
 </body>
 </html>
