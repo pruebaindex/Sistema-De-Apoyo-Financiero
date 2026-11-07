@@ -136,7 +136,7 @@
           <form id="transForm" class="space-y-4">
             <div>
               <label class="block text-xs font-semibold text-slate-400 mb-1.5">Descripción</label>
-              <input type="text" id="desc" required placeholder="Ej. Sueldo, Almuerzo, Supermercado" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 transition">
+              <input type="text" id="desc" required placeholder="Ej. Venta de mercancía, Pago de alquiler" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 transition">
             </div>
             <div class="grid grid-cols-2 gap-3">
               <div>
@@ -146,20 +146,38 @@
               <div>
                 <label class="block text-xs font-semibold text-slate-400 mb-1.5">Tipo</label>
                 <select id="type" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 transition">
-                  <option value="expense">Gasto</option>
-                  <option value="income">Ingreso</option>
+                  <option value="income">Ingreso / Entrada</option>
+                  <option value="expense">Costo / Gasto</option>
+                  <option value="equity">Patrimonio</option>
                 </select>
               </div>
             </div>
             <div>
-              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Categoría</label>
+              <label class="block text-xs font-semibold text-slate-400 mb-1.5">Categoría / Cuenta</label>
               <select id="category" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500 transition">
-                <option value="Comida y Alimentos">Comida y Alimentos</option>
-                <option value="Servicios y Facturas">Servicios y Facturas</option>
-                <option value="Transporte">Transporte</option>
-                <option value="Entretenimiento">Entretenimiento</option>
-                <option value="Ingreso/Sueldo">Ingreso / Sueldo</option>
-                <option value="Otros">Otros</option>
+                <optgroup label="--- PATRIMONIO ---">
+                  <option value="Capital social">Capital social</option>
+                  <option value="Reservas (Legal, estatutarias)">Reservas (Legal, estatutarias)</option>
+                  <option value="Utilidades retenidas / acumuladas">Utilidades retenidas / acumuladas</option>
+                  <option value="Pérdidas acumuladas">Pérdidas acumuladas</option>
+                  <option value="Resultado del ejercicio">Resultado del ejercicio</option>
+                </optgroup>
+                <optgroup label="--- INGRESOS ---">
+                  <option value="Ventas de mercancías">Ventas de mercancías</option>
+                  <option value="Ingresos por servicios">Ingresos por servicios</option>
+                  <option value="Ingresos financieros">Ingresos financieros</option>
+                  <option value="Otros ingresos / Ganancias diversas">Otros ingresos / Ganancias diversas</option>
+                </optgroup>
+                <optgroup label="--- COSTOS Y GASTOS ---">
+                  <option value="Costo de ventas">Costo de ventas</option>
+                  <option value="Compras de mercancía">Compras de mercancía</option>
+                  <option value="Sueldos y salarios (Gasto)">Sueldos y salarios (Gasto)</option>
+                  <option value="Alquileres / Arrendamientos">Alquileres / Arrendamientos</option>
+                  <option value="Servicios públicos (Agua, luz, internet)">Servicios públicos (Agua, luz, internet)</option>
+                  <option value="Publicidad y propaganda">Publicidad y propaganda</option>
+                  <option value="Gastos financieros / Comisiones bancarias">Gastos financieros / Comisiones bancarias</option>
+                  <option value="Depreciaciones">Depreciaciones</option>
+                </optgroup>
               </select>
             </div>
             <button type="submit" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-sm transition shadow-lg shadow-emerald-500/10">
@@ -170,8 +188,8 @@
 
         <div class="lg:col-span-2 bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 flex flex-col justify-between shadow-xl">
           <div class="flex justify-between items-center mb-4">
-            <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">DISTRIBUCIÓN DE GASTOS</h3>
-            <span class="text-xs text-slate-400">Por Categoría</span>
+            <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wider">DISTRIBUCIÓN DE MOVIMIENTOS</h3>
+            <span class="text-xs text-slate-400">Por Cuenta / Categoría</span>
           </div>
           <div class="relative flex-1 min-h-[240px] flex items-center justify-center">
             <canvas id="chartCanvas"></canvas>
@@ -262,19 +280,35 @@
       table.innerHTML = '';
 
       window.transactions.forEach(t => {
-        if (t.type === 'income') inc += t.amount;
-        else {
+        if (t.type === 'income') {
+          inc += t.amount;
+        } else if (t.type === 'expense') {
           exp += t.amount;
-          catMap[t.category] = (catMap[t.category] || 0) + t.amount;
         }
+        
+        catMap[t.category] = (catMap[t.category] || 0) + t.amount;
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-800/40 transition";
+        
+        let amountColor = 'text-slate-200';
+        let signPrefix = '';
+        if (t.type === 'income') {
+          amountColor = 'text-emerald-400';
+          signPrefix = '+';
+        } else if (t.type === 'expense') {
+          amountColor = 'text-rose-400';
+          signPrefix = '-';
+        } else {
+          amountColor = 'text-blue-400';
+          signPrefix = '•';
+        }
+
         tr.innerHTML = `
           <td class="px-4 py-3 font-medium text-slate-200">${t.desc}</td>
           <td class="px-4 py-3 text-xs text-slate-400">${t.category}</td>
-          <td class="px-4 py-3 font-bold ${t.type === 'income' ? 'text-emerald-400' : 'text-rose-400'}">
-            ${t.type === 'income' ? '+' : '-'}${formatMoney(t.amount, symbol)}
+          <td class="px-4 py-3 font-bold ${amountColor}">
+            ${signPrefix}${formatMoney(t.amount, symbol)}
           </td>
           <td class="px-4 py-3 text-right">
             <button onclick="deleteTrans('${t.id}')" class="text-rose-500 hover:text-rose-400 text-xs font-semibold">Eliminar</button>
@@ -302,10 +336,10 @@
       chartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-          labels: labels.length ? labels : ['Sin Gastos'],
+          labels: labels.length ? labels : ['Sin Registros'],
           datasets: [{
             data: data.length ? data : [1],
-            backgroundColor: labels.length ? ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#64748b'] : ['#334155'],
+            backgroundColor: labels.length ? ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#64748b', '#f43f5e'] : ['#334155'],
             borderWidth: 0
           }]
         },
@@ -384,7 +418,6 @@
         }
       };
 
-      // Traductor de errores de Firebase a mensajes claros y naturales
       function getFriendlyError(err) {
         const code = err.code || "";
         if (code.includes('email-already-in-use')) {
